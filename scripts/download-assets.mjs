@@ -17,7 +17,7 @@ const MIN_BYTES = 1024
 
 const manifest = {
   generatedAt: new Date().toISOString(),
-  credit: 'Assets via Poly Haven (CC0)',
+  credit: 'Assets via Poly Haven (CC0); samurai + dragon Grab3D CC0; credit Kaushik + AI',
   hdri: {},
   textures: {},
   rocks: {},
@@ -272,6 +272,7 @@ async function verifyTree() {
 
 async function main() {
   await mkdir(ROOT, { recursive: true })
+  await rm(path.join(ROOT, 'girl.glb'), { force: true })
   log('Tsushima Explorer — CC0 asset downloader')
   log(`Target: ${ROOT}`)
 
