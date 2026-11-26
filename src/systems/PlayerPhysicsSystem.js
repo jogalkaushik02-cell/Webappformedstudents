@@ -271,6 +271,9 @@ export default class PlayerPhysicsSystem {
       button.addEventListener('pointerup', up)
       button.addEventListener('pointercancel', up)
       button.addEventListener('pointerleave', up)
+      button.addEventListener('touchstart', down, { passive: false })
+      button.addEventListener('touchend', up, { passive: false })
+      button.addEventListener('touchcancel', up, { passive: false })
       dragonControls.appendChild(button)
     }
     addTouch('ASCEND', 'ascend')

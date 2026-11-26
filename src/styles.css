@@ -160,7 +160,7 @@ body {
 
 /* Dragon controls */
 .dragon-touch-controls {
-  display: none;
+  display: flex;
   position: fixed;
   z-index: 21;
   right: max(18px, env(safe-area-inset-right));
