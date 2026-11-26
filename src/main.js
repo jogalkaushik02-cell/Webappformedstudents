@@ -8,6 +8,8 @@ import GrassSystem from './systems/GrassSystem'
 import TreeSystem from './systems/TreeSystem'
 import PlayerPhysicsSystem from './systems/PlayerPhysicsSystem'
 import WeatherLeafSystem from './systems/WeatherLeafSystem'
+import DragonSystem from './systems/DragonSystem'
+import VillageSystem from './systems/VillageSystem'
 
 const loadingScreen = document.querySelector('#loading')
 const loadingBar = document.querySelector('#loading-progress')
@@ -104,7 +106,7 @@ async function boot() {
   const ambient = new THREE.AmbientLight(0x94a7b8, 0.22)
   scene.add(ambient)
 
-  const [skySunny, skyOvercast, grassColor, grassNormal, grassRough, dirtColor, dirtNormal, dirtRough, barkColor, barkNormal, barkRough, rockGltf] =
+  const [skySunny, skyOvercast, grassColor, grassNormal, grassRough, dirtColor, dirtNormal, dirtRough, barkColor, barkNormal, barkRough, rockGltf, dragonGltf] =
     await Promise.all([
       loadHdr('/assets/sky_sunny.hdr'),
       loadHdr('/assets/sky_overcast.hdr'),
@@ -118,6 +120,7 @@ async function boot() {
       loadTexture('/assets/bark_normal.jpg'),
       loadTexture('/assets/bark_rough.jpg'),
       loadGltf('/assets/rocks/rock_moss_set_01_1k.gltf'),
+      loadGltf('/assets/low-poly-dragon.glb'),
     ])
 
   const pmrem = new THREE.PMREMGenerator(renderer)
@@ -192,15 +195,28 @@ async function boot() {
     textures: { barkColor, barkNormal, barkRough },
     rockGltf,
   })
+  const village = new VillageSystem({ scene, terrain })
+  const collisionCircles = [...trees.collisionCircles, ...village.collisionCircles]
   const player = new PlayerPhysicsSystem({
     scene,
     camera,
     terrain,
     renderer,
-    collisionCircles: trees.collisionCircles,
+    collisionCircles,
     loadingManager: manager,
   })
   await player.load()
+
+  const dragon = new DragonSystem({
+    scene,
+    terrain,
+    renderer,
+    dragonGltf,
+    villageCenter: village.center,
+    loadingManager: manager,
+  })
+  player.setRidingDragon(dragon.seat)
+  player.distance = 14
 
   const weather = new WeatherLeafSystem({
     scene,
@@ -261,6 +277,8 @@ async function boot() {
   function animate() {
     const dt = Math.min(clock.getDelta(), 0.05)
     elapsed += dt
+    village.update(dt, elapsed)
+    dragon.update(dt, elapsed, village.getTargets(), (npc) => village.killNpc(npc))
     player.update(dt, elapsed)
     weather.update(dt, elapsed, player.position)
     grass.update(elapsed, player.position, camera, weather.sunDirection, dt)

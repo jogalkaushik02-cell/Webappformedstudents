@@ -196,7 +196,28 @@ async function downloadCharacter() {
   manifest.character = {
     source: 'Three.js examples (MIT)',
     ...result,
-    optional: 'Place a custom samurai.glb in public/assets/ to override it.',
+  }
+  return result
+}
+
+async function downloadSamurai() {
+  log('\n[Character] CC0 rigged samurai')
+  const url = 'https://grab3d.com/dl/samurai-rigged/samurai-rigged.glb'
+  const result = await download(url, 'samurai-rigged.glb', 'glb', 'samurai-rigged.glb')
+  manifest.samurai = {
+    source: 'Grab3D (CC0 1.0)',
+    ...result,
+  }
+  return result
+}
+
+async function downloadDragon() {
+  log('\n[Model] CC0 low-poly flying mount dragon')
+  const url = 'https://grab3d.com/dl/low-poly-dragon/low-poly-dragon.glb'
+  const result = await download(url, 'low-poly-dragon.glb', 'glb', 'low-poly-dragon.glb')
+  manifest.dragon = {
+    source: 'Grab3D (CC0 1.0)',
+    ...result,
   }
   return result
 }
@@ -235,6 +256,8 @@ async function verifyTree() {
     'bark_normal.jpg',
     'bark_rough.jpg',
     'character_rig.glb',
+    'samurai-rigged.glb',
+    'low-poly-dragon.glb',
   ]
   for (const name of required) {
     if (!files.some((file) => file.path === name)) throw new Error(`Missing required asset: ${name}`)
@@ -287,6 +310,8 @@ async function main() {
   })
   await downloadRockSet()
   await downloadCharacter()
+  await downloadSamurai()
+  await downloadDragon()
   await verifyTree()
   log('\nDone. Start the app with: npm run dev')
 }

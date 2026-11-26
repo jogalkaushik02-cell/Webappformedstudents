@@ -35,11 +35,13 @@ export default class PlayerPhysicsSystem {
     this.character.add(this.bob)
     this.scene.add(this.character)
     this.ready = false
-    this.useGirl = true
+    this.riding = false
+    this.ridingSeat = null
+    this.groundClearance = 0
     this.mixer = null
     this.actions = {}
     this.activeAction = null
-    this.visualHeight = 1.72
+    this.visualHeight = 1.78
     this.model = null
     this.setupInput()
     this.position.set(0, this.terrain.getHeight(0, 0), 0)
@@ -55,13 +57,11 @@ export default class PlayerPhysicsSystem {
 
     let gltf = null
     try {
-      gltf = await loadUrl('/assets/girl.glb')
-      this.useGirl = true
+      gltf = await loadUrl('/assets/samurai-rigged.glb')
     } catch (error) {
-      console.warn('girl.glb failed, trying character_rig.glb', error)
+      console.warn('samurai-rigged.glb failed, trying character_rig.glb', error)
       try {
         gltf = await loadUrl('/assets/character_rig.glb')
-        this.useGirl = false
       } catch (fallbackError) {
         console.error('No player model loaded', fallbackError)
         return
@@ -109,7 +109,6 @@ export default class PlayerPhysicsSystem {
       }
     }
 
-    if (this.useGirl) this.addSamuraiAccents()
     this.ready = true
   }
 
@@ -258,8 +257,48 @@ export default class PlayerPhysicsSystem {
     return next
   }
 
+  setRidingDragon(seat, { localX = 0.32, localY = 0.78, localZ = 0.08 } = {}) {
+    if (!this.character || !seat) return
+    this.riding = true
+    this.ridingSeat = seat
+    seat.attach(this.character)
+    this.character.position.set(localX, localY, localZ)
+    this.character.rotation.set(0, Math.PI, 0)
+    this.character.scale.set(1, 1, 1)
+    if (this.mixer) this.fadeAction(this.actions.idle)
+  }
+
+  updateCamera(dt, targetHeight = 1.35) {
+    const cosPitch = Math.cos(this.orbitPitch)
+    const target = new THREE.Vector3(this.position.x, this.position.y + targetHeight, this.position.z)
+    this.cameraTarget.lerp(target, 1 - Math.exp(-dt * 10))
+    const desired = this.cameraTarget.clone().add(
+      new THREE.Vector3(
+        -Math.sin(this.orbitYaw) * this.distance * cosPitch + Math.cos(this.orbitYaw) * 0.42,
+        1.2 + Math.sin(this.orbitPitch) * this.distance,
+        -Math.cos(this.orbitYaw) * this.distance * cosPitch - Math.sin(this.orbitYaw) * 0.42,
+      ),
+    )
+    if (!this.riding) {
+      const cameraGround = this.terrain.getHeight(desired.x, desired.z)
+      desired.y = Math.max(desired.y, cameraGround + 1.15)
+    }
+    this.cameraDesired.lerp(desired, 1 - Math.exp(-dt * 9))
+    this.camera.position.copy(this.cameraDesired)
+    this.camera.lookAt(this.cameraTarget.clone().add(new THREE.Vector3(0, 0.05, 0)))
+  }
+
   update(dt, time) {
     if (!this.ready) return
+    if (this.riding) {
+      if (this.mixer) {
+        this.mixer.update(dt)
+        this.fadeAction(this.actions.idle)
+      }
+      this.character.getWorldPosition(this.position)
+      this.updateCamera(dt, 2.4)
+      return
+    }
     const inputX =
       (this.keys.has('d') || this.keys.has('arrowright') ? 1 : 0) -
       (this.keys.has('a') || this.keys.has('arrowleft') ? 1 : 0) +
@@ -286,9 +325,10 @@ export default class PlayerPhysicsSystem {
       this.resolveCollisions(this.position)
     }
     const ground = this.terrain.getHeight(this.position.x, this.position.z)
-    this.position.y += (ground - this.position.y) * Math.min(1, dt * 14)
-    this.character.position.copy(this.position)
-    this.character.rotation.y = this.yaw
+    this.position.y = ground + this.groundClearance
+    this.character.position.set(this.position.x, this.position.y, this.position.z)
+    this.character.rotation.set(0, this.yaw, 0)
+    this.character.updateMatrixWorld(true)
 
     const speedNow = move.lengthSq() > 0.0001 ? speed : 0
     if (this.mixer) {
@@ -304,20 +344,6 @@ export default class PlayerPhysicsSystem {
       this.bob.rotation.x = stride * 0.035 + Math.sin(time * 1.4) * 0.006
     }
 
-    const cosPitch = Math.cos(this.orbitPitch)
-    const target = new THREE.Vector3(this.position.x, this.position.y + 1.35, this.position.z)
-    this.cameraTarget.lerp(target, 1 - Math.exp(-dt * 10))
-    const desired = this.cameraTarget.clone().add(
-      new THREE.Vector3(
-        -Math.sin(this.orbitYaw) * this.distance * cosPitch + Math.cos(this.orbitYaw) * 0.42,
-        1.2 + Math.sin(this.orbitPitch) * this.distance,
-        -Math.cos(this.orbitYaw) * this.distance * cosPitch - Math.sin(this.orbitYaw) * 0.42,
-      ),
-    )
-    const cameraGround = this.terrain.getHeight(desired.x, desired.z)
-    desired.y = Math.max(desired.y, cameraGround + 1.15)
-    this.cameraDesired.lerp(desired, 1 - Math.exp(-dt * 9))
-    this.camera.position.copy(this.cameraDesired)
-    this.camera.lookAt(this.cameraTarget.clone().add(new THREE.Vector3(0, 0.05, 0)))
+    this.updateCamera(dt, 1.35)
   }
 }
