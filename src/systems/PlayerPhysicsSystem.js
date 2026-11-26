@@ -25,6 +25,7 @@ export default class PlayerPhysicsSystem {
     this.distance = 7.4
     this.keys = new Set()
     this.touchInput = new THREE.Vector2()
+    this.touchFlags = { ascend: false, descend: false, fire: false, enterExit: false, land: false }
     this.orbitPointer = null
     this.orbitLast = new THREE.Vector2()
     this.cameraTarget = new THREE.Vector3()
@@ -148,8 +149,28 @@ export default class PlayerPhysicsSystem {
   setupInput() {
     const onKey = (event, down) => {
       if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return
-      const key = event.key.toLowerCase()
-      if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'shift'].includes(key)) {
+      let key = event.key.toLowerCase()
+      if (key === ' ' || key === 'spacebar') key = 'space'
+      if (
+        [
+          'w',
+          'a',
+          's',
+          'd',
+          'arrowup',
+          'arrowdown',
+          'arrowleft',
+          'arrowright',
+          'shift',
+          'space',
+          'c',
+          'control',
+          'f',
+          'e',
+          'x',
+          'l',
+        ].includes(key)
+      ) {
         event.preventDefault()
         if (down) this.keys.add(key)
         else this.keys.delete(key)
@@ -230,6 +251,34 @@ export default class PlayerPhysicsSystem {
     base.addEventListener('pointerleave', (event) => {
       if (event.buttons === 0) reset()
     })
+
+    const dragonControls = document.createElement('div')
+    dragonControls.className = 'dragon-touch-controls'
+    dragonControls.setAttribute('aria-label', 'Dragon controls')
+    const addTouch = (label, key) => {
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.textContent = label
+      const down = (event) => {
+        event.preventDefault()
+        this.touchFlags[key] = true
+      }
+      const up = (event) => {
+        event.preventDefault()
+        this.touchFlags[key] = false
+      }
+      button.addEventListener('pointerdown', down)
+      button.addEventListener('pointerup', up)
+      button.addEventListener('pointercancel', up)
+      button.addEventListener('pointerleave', up)
+      dragonControls.appendChild(button)
+    }
+    addTouch('ASCEND', 'ascend')
+    addTouch('DESCEND', 'descend')
+    addTouch('FIRE', 'fire')
+    addTouch('RIDE / EXIT', 'enterExit')
+    addTouch('LAND', 'land')
+    document.body.appendChild(dragonControls)
   }
 
   fadeAction(next, duration = 0.2) {
@@ -257,15 +306,55 @@ export default class PlayerPhysicsSystem {
     return next
   }
 
-  setRidingDragon(seat, { localX = 0.32, localY = 0.78, localZ = 0.08 } = {}) {
+  setRidingDragon(seat, dragon = null, { localX = 0.32, localY = 0.78, localZ = 0.08 } = {}) {
     if (!this.character || !seat) return
     this.riding = true
     this.ridingSeat = seat
+    this.dragon = dragon
     seat.attach(this.character)
     this.character.position.set(localX, localY, localZ)
     this.character.rotation.set(0, Math.PI, 0)
     this.character.scale.set(1, 1, 1)
     if (this.mixer) this.fadeAction(this.actions.idle)
+  }
+
+  stopRidingDragon() {
+    if (!this.riding) return
+    this.character.getWorldPosition(this.position)
+    this.scene.attach(this.character)
+    this.riding = false
+    this.ridingSeat = null
+    this.orbitYaw = this.dragon?.group.rotation.y ?? this.orbitYaw
+    this.character.position.set(this.position.x, this.position.y, this.position.z)
+    this.character.rotation.set(0, this.orbitYaw, 0)
+    this.character.scale.set(1, 1, 1)
+    const ground = this.terrain.getHeight(this.position.x, this.position.z)
+    this.position.y = Math.max(this.position.y, ground + this.groundClearance + 0.05)
+    this.character.position.y = this.position.y
+    this.character.updateMatrixWorld(true)
+    if (this.mixer) this.fadeAction(this.actions.idle)
+  }
+
+  getControlInput() {
+    const inputX =
+      (this.keys.has('d') || this.keys.has('arrowright') ? 1 : 0) -
+      (this.keys.has('a') || this.keys.has('arrowleft') ? 1 : 0) +
+      this.touchInput.x
+    const inputZ =
+      (this.keys.has('w') || this.keys.has('arrowup') ? 1 : 0) -
+      (this.keys.has('s') || this.keys.has('arrowdown') ? 1 : 0) +
+      this.touchInput.y
+    return {
+      x: THREE.MathUtils.clamp(inputX, -1, 1),
+      z: THREE.MathUtils.clamp(inputZ, -1, 1),
+      ascend: this.keys.has('space') || this.touchFlags.ascend,
+      descend: this.keys.has('c') || this.keys.has('control') || this.touchFlags.descend,
+      running: this.keys.has('shift') || Math.hypot(this.touchInput.x, this.touchInput.y) > 0.75,
+      fire: this.keys.has('f') || this.touchFlags.fire,
+      enter: this.keys.has('e') || this.touchFlags.enterExit,
+      exit: this.keys.has('e') || this.keys.has('x') || this.touchFlags.enterExit,
+      land: this.keys.has('l') || this.touchFlags.land,
+    }
   }
 
   updateCamera(dt, targetHeight = 1.35) {
@@ -290,12 +379,23 @@ export default class PlayerPhysicsSystem {
 
   update(dt, time) {
     if (!this.ready) return
+    const control = this.getControlInput()
     if (this.riding) {
       if (this.mixer) {
         this.mixer.update(dt)
         this.fadeAction(this.actions.idle)
       }
+      if (control.exit) {
+        this.stopRidingDragon()
+        this.updateCamera(dt, 1.35)
+        return
+      }
       this.character.getWorldPosition(this.position)
+      this.updateCamera(dt, 2.4)
+      return
+    }
+    if (control.enter && this.dragon?.seat) {
+      this.setRidingDragon(this.dragon.seat, this.dragon)
       this.updateCamera(dt, 2.4)
       return
     }

@@ -215,7 +215,7 @@ async function boot() {
     villageCenter: village.center,
     loadingManager: manager,
   })
-  player.setRidingDragon(dragon.seat)
+  player.setRidingDragon(dragon.seat, dragon)
   player.distance = 14
 
   const weather = new WeatherLeafSystem({
@@ -278,7 +278,14 @@ async function boot() {
     const dt = Math.min(clock.getDelta(), 0.05)
     elapsed += dt
     village.update(dt, elapsed)
-    dragon.update(dt, elapsed, village.getTargets(), (npc) => village.killNpc(npc))
+    const control = player.getControlInput()
+    dragon.update(
+      dt,
+      elapsed,
+      village.getTargets(),
+      (npc) => village.killNpc(npc),
+      player.riding ? control : null,
+    )
     player.update(dt, elapsed)
     weather.update(dt, elapsed, player.position)
     grass.update(elapsed, player.position, camera, weather.sunDirection, dt)

@@ -157,3 +157,31 @@ body {
   .hud-stats { gap: 9px; font-size: 8px; }
   .world-mark { display: none; }
 }
+
+/* Dragon controls */
+.dragon-touch-controls {
+  display: none;
+  position: fixed;
+  z-index: 21;
+  right: max(18px, env(safe-area-inset-right));
+  bottom: max(34px, env(safe-area-inset-bottom));
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+.dragon-touch-controls button {
+  min-width: 92px;
+  padding: 9px 11px;
+  border: 1px solid rgba(233, 196, 106, 0.45);
+  border-radius: 12px;
+  background: rgba(8, 12, 9, 0.72);
+  color: #f2e8cf;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+@media (pointer: coarse) {
+  .dragon-touch-controls { display: flex; }
+}
