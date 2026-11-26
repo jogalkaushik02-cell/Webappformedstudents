@@ -162,7 +162,7 @@ body {
 .dragon-touch-controls {
   display: flex;
   position: fixed;
-  z-index: 21;
+  z-index: 1002;
   right: max(18px, env(safe-area-inset-right));
   bottom: max(34px, env(safe-area-inset-bottom));
   flex-direction: column;

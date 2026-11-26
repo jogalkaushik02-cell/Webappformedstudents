@@ -286,7 +286,7 @@ async function boot() {
       (npc) => village.killNpc(npc),
       player.riding ? control : null,
     )
-    player.update(dt, elapsed)
+    player.update(dt, elapsed, control)
     weather.update(dt, elapsed, player.position)
     grass.update(elapsed, player.position, camera, weather.sunDirection, dt)
     trees.update(elapsed, player.position)

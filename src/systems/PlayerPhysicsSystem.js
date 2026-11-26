@@ -261,10 +261,12 @@ export default class PlayerPhysicsSystem {
       button.textContent = label
       const down = (event) => {
         event.preventDefault()
+        event.stopPropagation()
         this.touchFlags[key] = true
       }
       const up = (event) => {
         event.preventDefault()
+        event.stopPropagation()
         this.touchFlags[key] = false
       }
       button.addEventListener('pointerdown', down)
@@ -380,9 +382,8 @@ export default class PlayerPhysicsSystem {
     this.camera.lookAt(this.cameraTarget.clone().add(new THREE.Vector3(0, 0.05, 0)))
   }
 
-  update(dt, time) {
+  update(dt, time, control = this.getControlInput()) {
     if (!this.ready) return
-    const control = this.getControlInput()
     if (this.riding) {
       if (this.mixer) {
         this.mixer.update(dt)
@@ -402,20 +403,12 @@ export default class PlayerPhysicsSystem {
       this.updateCamera(dt, 2.4)
       return
     }
-    const inputX =
-      (this.keys.has('d') || this.keys.has('arrowright') ? 1 : 0) -
-      (this.keys.has('a') || this.keys.has('arrowleft') ? 1 : 0) +
-      this.touchInput.x
-    const inputZ =
-      (this.keys.has('w') || this.keys.has('arrowup') ? 1 : 0) -
-      (this.keys.has('s') || this.keys.has('arrowdown') ? 1 : 0) +
-      this.touchInput.y
-    const input = new THREE.Vector2(inputX, inputZ)
+    const input = new THREE.Vector2(control.x, control.z)
     if (input.lengthSq() > 1) input.normalize()
     const forward = new THREE.Vector3(Math.sin(this.orbitYaw), 0, Math.cos(this.orbitYaw))
     const right = new THREE.Vector3(Math.cos(this.orbitYaw), 0, -Math.sin(this.orbitYaw))
     const move = forward.multiplyScalar(input.y).add(right.multiplyScalar(input.x))
-    const running = this.keys.has('shift') || Math.hypot(this.touchInput.x, this.touchInput.y) > 0.75
+    const running = control.running
     const normal = this.terrain.getNormal(this.position.x, this.position.z)
     const slope = THREE.MathUtils.clamp(normal.y, 0.45, 1)
     const speed = (running ? 6.4 : 3.1) * (0.62 + slope * 0.38)
