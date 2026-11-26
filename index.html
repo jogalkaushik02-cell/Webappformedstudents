@@ -2,34 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#090d0b" />
-    <title>Tsushima Explorer — Feudal Japan</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#070a12" />
+    <title>ELIT — 60 Second Cinematic Trailer</title>
   </head>
   <body>
-    <div id="loading" aria-live="polite">
-      <div class="loading-inner">
-        <div class="loading-kicker">A FEUDAL JAPAN OPEN-WORLD STUDY</div>
-        <h1>TSUSHIMA<br /><em>EXPLORER</em></h1>
-        <div class="loading-rule"></div>
-        <div class="loading-track"><div id="loading-progress"></div></div>
-        <div id="loading-text">Preparing the valley…</div>
-        <div class="loading-credit">Assets via Poly Haven (CC0) · Samurai + dragon Grab3D CC0 · Credit: Kaushik + AI</div>
-      </div>
-    </div>
-
-    <div id="hud" class="hud" aria-label="Performance HUD">
-      <div class="hud-title">TSUSHIMA EXPLORER</div>
-      <div class="hud-stats">
-        <span><b id="hud-fps">—</b> FPS</span>
-        <span><b id="hud-calls">—</b> CALLS</span>
-        <span><b id="hud-tris">—</b> TRIS</span>
-      </div>
-      <div class="hud-credit">Assets via Poly Haven (CC0) · Samurai + dragon Grab3D CC0 · Credit: Kaushik + AI</div>
-    </div>
-
-    <div class="world-hint">WASD · Space ascend · C descend · F fireball · L land · E ride/exit · Shift speed · drag orbit</div>
-    <div class="world-mark">CREDIT KAUSHIK + AI</div>
+    <canvas id="world" aria-label="60 second ELIT cinematic trailer"></canvas>
+    <section id="title-card" class="title-card" hidden>
+      <div class="eyebrow">A SAURASHTRA GATHERING</div>
+      <h1>ELIT</h1>
+      <p>GET TOGETHER</p>
+      <small>WELCOME TO ELIT</small>
+    </section>
+    <section id="caption" class="caption" aria-live="polite"></section>
+    <div id="progress" class="progress"><span></span></div>
+    <div id="hint" class="hint">Press Space / tap to restart · 60 seconds</div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
