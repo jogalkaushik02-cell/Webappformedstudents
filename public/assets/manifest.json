@@ -1,0 +1,86 @@
+{
+  "generatedAt": "2026-11-26T18:16:19.785Z",
+  "credit": "Assets via Poly Haven (CC0)",
+  "hdri": {
+    "sky_sunny": {
+      "slug": "kloofendal_48d_partly_cloudy_puresky",
+      "bytes": 1435119,
+      "url": "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/kloofendal_48d_partly_cloudy_puresky_1k.hdr"
+    },
+    "sky_overcast": {
+      "slug": "kloofendal_overcast_puresky",
+      "bytes": 1174053,
+      "url": "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/kloofendal_overcast_puresky_1k.hdr"
+    }
+  },
+  "textures": {
+    "grass": {
+      "slug": "aerial_grass_rock",
+      "color": {
+        "path": "/data/data/com.termux/files/home/opencode-termux/tsushima-explorer/public/assets/grass_color.jpg",
+        "bytes": 666655,
+        "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/aerial_grass_rock/aerial_grass_rock_diff_1k.jpg"
+      },
+      "normal": {
+        "path": "/data/data/com.termux/files/home/opencode-termux/tsushima-explorer/public/assets/grass_normal.jpg",
+        "bytes": 904956,
+        "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/aerial_grass_rock/aerial_grass_rock_nor_gl_1k.jpg"
+      },
+      "rough": {
+        "path": "/data/data/com.termux/files/home/opencode-termux/tsushima-explorer/public/assets/grass_rough.jpg",
+        "bytes": 362214,
+        "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/aerial_grass_rock/aerial_grass_rock_rough_1k.jpg"
+      }
+    },
+    "dirt": {
+      "slug": "brown_mud_leaves_01",
+      "color": {
+        "path": "/data/data/com.termux/files/home/opencode-termux/tsushima-explorer/public/assets/dirt_color.jpg",
+        "bytes": 1206953,
+        "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/brown_mud_leaves_01/brown_mud_leaves_01_diff_1k.jpg"
+      },
+      "normal": {
+        "path": "/data/data/com.termux/files/home/opencode-termux/tsushima-explorer/public/assets/dirt_normal.jpg",
+        "bytes": 1486072,
+        "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/brown_mud_leaves_01/brown_mud_leaves_01_nor_gl_1k.jpg"
+      },
+      "rough": {
+        "path": "/data/data/com.termux/files/home/opencode-termux/tsushima-explorer/public/assets/dirt_rough.jpg",
+        "bytes": 644332,
+        "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/brown_mud_leaves_01/brown_mud_leaves_01_rough_1k.jpg"
+      }
+    },
+    "bark": {
+      "slug": "bark_brown_01",
+      "color": {
+        "path": "/data/data/com.termux/files/home/opencode-termux/tsushima-explorer/public/assets/bark_color.jpg",
+        "bytes": 729893,
+        "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/bark_brown_01/bark_brown_01_diff_1k.jpg"
+      },
+      "normal": {
+        "path": "/data/data/com.termux/files/home/opencode-termux/tsushima-explorer/public/assets/bark_normal.jpg",
+        "bytes": 1226534,
+        "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/bark_brown_01/bark_brown_01_nor_gl_1k.jpg"
+      },
+      "rough": {
+        "path": "/data/data/com.termux/files/home/opencode-termux/tsushima-explorer/public/assets/bark_rough.jpg",
+        "bytes": 201307,
+        "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/bark_brown_01/bark_brown_01_rough_1k.jpg"
+      }
+    }
+  },
+  "rocks": {
+    "slug": "rock_moss_set_01",
+    "gltf": "rocks/rock_moss_set_01_1k.gltf",
+    "path": "/data/data/com.termux/files/home/opencode-termux/tsushima-explorer/public/assets/rocks/rock_moss_set_01_1k.gltf",
+    "bytes": 9987,
+    "url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/rock_moss_set_01/rock_moss_set_01_1k.gltf"
+  },
+  "character": {
+    "source": "Three.js examples (MIT)",
+    "path": "/data/data/com.termux/files/home/opencode-termux/tsushima-explorer/public/assets/character_rig.glb",
+    "bytes": 2160468,
+    "url": "https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/Soldier.glb",
+    "optional": "Place a custom samurai.glb in public/assets/ to override it."
+  }
+}
